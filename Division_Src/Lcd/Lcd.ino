@@ -17,7 +17,7 @@
 
 int mode, stat, sensor;
 
-LiquidCrystal_I2C lcd(0x3F, 16, 2); //0x20 or 0x27 or 0x3F
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void Pin_init();
 void Lcd_start();
@@ -34,6 +34,8 @@ void setup() {
   Lcd_start();
   mode = 1;
   stat = 1;
+  sensor = 1;
+  Serial.begin(9600);
 }
 //lcd.setCursor(0,0);            
 //lcd.print("    "); 
@@ -46,26 +48,29 @@ void loop() {
   switch (mode) {
     case ONLINE: 
       if(stat) Menu_blink();
-      
+     
       if(digitalRead(NEXT_SW) == LOW)
       {
         stat = 1;
         mode = OFFLINE;
-   
-        while(digitalRead(NEXT_SW));
+        Serial.print("next");
+        while(digitalRead(NEXT_SW) == LOW);
          delay(30);
       }
 
       if(digitalRead(OK_SW) == LOW)
       {
+        lcd.clear();
+        lcd.noBlink();
         lcd.setCursor(0, 0);
         lcd.print("Wait....");
+        delay(1000);
         //if bluetooth on, print("complet");
         stat = 1;
         
         Chk_sensor_online();
 
-        while(digitalRead(NEXT_SW));
+        while(digitalRead(NEXT_SW)==LOW);
         delay(30);
         
       }
@@ -79,7 +84,7 @@ void loop() {
         stat = 1;
         mode = ONLINE;
         
-        while(digitalRead(NEXT_SW));
+        while(digitalRead(NEXT_SW)==LOW);
          delay(30);
       }
       
@@ -89,7 +94,7 @@ void loop() {
        
         Chk_sensor_offline();
         
-        while(digitalRead(NEXT_SW));
+        while(digitalRead(NEXT_SW)==LOW);
         delay(30);
       }
       break;
@@ -104,29 +109,32 @@ void Chk_sensor_online()
   {
     if(stat) Select_menu_print();
     
-    if(digitalRead(NEXT_SW == LOW))
+    if(digitalRead(NEXT_SW)==LOW)
     {
       stat = 1;
-      if(sensor = TEMP)
+      if(sensor == TEMP)
         sensor = PULSE;
-      else if(sensor = PULSE)
+      else if(sensor == PULSE)
         sensor = TEMP;
+
+      while(digitalRead(NEXT_SW)==LOW)
+      delay(30);
     }
 
-    if(digitalRead(OK_SW == LOW))
+    if(digitalRead(OK_SW)==LOW)
     {
       //if(sensor == TEMP)
       
       //else if(sensor == PULSE)
 
-      while(digitalRead(OK_SW == LOW));
+      while(digitalRead(OK_SW)==LOW);
       delay(30);
     }
    
   
-    if(digitalRead(RETURN_SW == LOW))
+    if(digitalRead(RETURN_SW)==LOW)
     {
-      while(digitalRead(RETURN_SW ==LOW));
+      while(digitalRead(RETURN_SW)==LOW);
       delay(30);
       break;
     }
@@ -139,25 +147,25 @@ void Chk_sensor_offline()
   {
     if(stat) Select_menu_print();
     
-    if(digitalRead(NEXT_SW == LOW))
+    if(digitalRead(NEXT_SW)==LOW)
     {
       stat = 1;
     }
 
-    if(digitalRead(OK_SW == LOW))
+    if(digitalRead(OK_SW)==LOW)
     {
       if(sensor == TEMP)
         lcd.print("d");
       else if(sensor == PULSE)
         lcd.print("d");
-      while(digitalRead(OK_SW == LOW));
+      while(digitalRead(OK_SW)==LOW);
       delay(30);
       
     }
   
-    if(digitalRead(RETURN_SW == LOW))
+    if(digitalRead(RETURN_SW)==LOW)
     {
-      while(digitalRead(RETURN_SW ==LOW));
+      while(digitalRead(RETURN_SW)==LOW);
       delay(30);
       
       break;
@@ -231,4 +239,15 @@ void Select_menu_print()
   
   lcd.setCursor(0, 1);
   lcd.print("Temp/Pulse");
+
+  if(sensor == TEMP)
+  {
+    lcd.setCursor(0,1);
+    lcd.blink();
+  }
+  else if(sensor == PULSE)
+  {
+    lcd.setCursor(5,1);
+    lcd.blink();
+  }
 }
