@@ -23,6 +23,8 @@ volatile int back = LOW;
 volatile int returnSw = LOW;
 volatile int okSw = LOW;
 
+byte data[4];
+
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 SoftwareSerial btSerial(PIN_TX, PIN_RX);

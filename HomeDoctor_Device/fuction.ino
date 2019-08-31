@@ -54,33 +54,49 @@ int On_line_mode()
     {
       if(digitalRead(CHECK_SW)==LOW)
       {
-        String strTemp = String("");
-        //strTemp = mlx.readObjectTempC();
-        strTemp = 36.5;
-        
+        //float Temp = mlx.readObjectTempC();
+        Serial.flush();
+        char s1[] = "t ";
+        char s2[] = "36.5";
+        float temp = 36.5;
+        dtostrf(temp, 4, 1, s2);
+    
         lcd.clear();
         lcd.home();
-        lcd.print("Ok...");
+        lcd.print("Wait...");
         delay(3000);
+
+        tone(PIEZO, 271);
+        delay(500);
+        noTone(PIEZO);
         //부저
         lcd.clear();
         lcd.home();
         lcd.print("Temp: ");
 
         lcd.setCursor(6, 0);
-        lcd.print(strTemp);
+        lcd.print(temp);
         lcd.setCursor(10, 0);
         lcd.print("`C");
 
         lcd.setCursor(0,1);
      
-        if(strTemp.toInt()>= 36 && strTemp.toInt() <= 38)
-          lcd.print("It`s Good!");
+        if(temp >= 36 && temp <= 38)
+            lcd.print("It`s Good!");
         else
           lcd.print("It`s bad...");
         delay(2500);
 
-        btSerial.print(strTemp);
+        lcd.clear();
+        lcd.home();
+        lcd.print("sending...");
+        
+        strcat(s1, s2);
+        btSerial.write(s1);
+        delay(1000);
+        
+        Serial.flush();
+        
         lcd.clear();
         lcd.home();
         lcd.print("send complete!");
@@ -181,6 +197,10 @@ int Off_line_mode()
         lcd.home();
         lcd.print("Ok...");
         delay(3000);
+        
+        tone(PIEZO, 271);
+        delay(500);
+        noTone(PIEZO);
         //부저
         lcd.clear();
         lcd.home();
@@ -335,7 +355,7 @@ void Pin_init() //Pull-up
 {
   int i;
   
-  for(i=4;i<8;i++) //Switch input
+  for(i=2;i<6;i++) //Switch input
      pinMode(i, INPUT); 
 
   for(i=8;i<11;i++) //led output
@@ -377,5 +397,5 @@ void Bluetooth_init()
    {
       btSerial.write(Serial.read());
     }  
- // }
+  //}
 }
