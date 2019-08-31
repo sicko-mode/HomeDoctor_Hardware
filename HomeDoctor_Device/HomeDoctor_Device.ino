@@ -1,6 +1,6 @@
 #include <LiquidCrystal_I2C.h>
 #include <SoftwareSerial.h>
-
+#include <Adafruit_MLX90614.h>
 #include <Wire.h>
 
 #define PIN_RX 12
@@ -23,6 +23,7 @@ volatile int back = LOW;
 volatile int returnSw = LOW;
 volatile int okSw = LOW;
 
+Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 SoftwareSerial btSerial(PIN_TX, PIN_RX);
 
@@ -35,7 +36,7 @@ void Chk_sensor();
 void Print_error();
 void Check_bpm();
 void Return_select();
-
+void Bluetooth_init();
 int On_line_mode();
 int Off_line_mode();
 
@@ -44,9 +45,10 @@ void setup() {
   Pin_init();
   Lcd_init();
   Lcd_hello();
-
+  Bluetooth_init();
+  mlx.begin();
+  
   Menu_network();
-  btSerial.begin(9600);
 }
 
 void loop() {

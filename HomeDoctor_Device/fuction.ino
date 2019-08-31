@@ -42,29 +42,122 @@ void Chk_sensor()
 
 int On_line_mode()
 {
-  int check = 0;
-  /*
-  if(select) // Temperature mode
+  back = 0;
+  
+   if(select) // Temperature mode
   {
     lcd.clear();
     lcd.home();
     lcd.print("Press chk btn");
-    delay(1000);
 
-    while(digitalRead(CHK_SW)==LOW)
+    while(1)
     {
-      delay(3000);
-      lcd.clear();
-      lcd.home();
-      lcd.print("Good!");
-      delay(1000);
+      if(digitalRead(CHECK_SW)==LOW)
+      {
+        String strTemp = String("");
+        //strTemp = mlx.readObjectTempC();
+        strTemp = 36.5;
+        
+        lcd.clear();
+        lcd.home();
+        lcd.print("Ok...");
+        delay(3000);
+        //부저
+        lcd.clear();
+        lcd.home();
+        lcd.print("Temp: ");
+
+        lcd.setCursor(6, 0);
+        lcd.print(strTemp);
+        lcd.setCursor(10, 0);
+        lcd.print("`C");
+
+        lcd.setCursor(0,1);
+     
+        if(strTemp.toInt()>= 36 && strTemp.toInt() <= 38)
+          lcd.print("It`s Good!");
+        else
+          lcd.print("It`s bad...");
+        delay(2500);
+
+        btSerial.print(strTemp);
+        lcd.clear();
+        lcd.home();
+        lcd.print("send complete!");
+        
+        delay(1000);
+        break;
+      }
+        
+      if(digitalRead(RETURN_SW)==LOW)
+      {
+        while(digitalRead(RETURN_SW)==LOW);
+        delay(30);
+        break;
+      }  
     }
   }
   else //Heart rate mode
   {
+    lcd.clear();
+    lcd.home();
+    lcd.print("Put Finger on");
+    delay(1500);
+
+   // EIFR |= (1<<INTF0);
+    //EIFR |= (1<<INTF1);
+    attachInterrupt(0, Check_bpm, FALLING);
+    attachInterrupt(1, Return_select, FALLING);
     
-  }*/
+    while(1)
+    {
+      if(back)
+      {
+        back = 0;
+
+        if(returnSw)
+        {
+          lcd.clear();
+          lcd.home();
+          lcd.print("wait...");
+          returnSw = LOW;
+        }
+
+        if(okSw)
+        {
+          lcd.clear();
+          lcd.home();
+          lcd.print("bpm: 87");
+
+          lcd.setCursor(0,1);
+          lcd.print("It` good!");
+          okSw = LOW;
+         
+          delay(2000);
+        }
+        delay(1000);
+        break;
+      }
+      else
+      {
+        lcd.clear();
+        lcd.home();
+        lcd.print("Heart-rate");
+        lcd.setCursor(0, 1);
+        lcd.print("87...");
+        delay(1000);
+        
+        lcd.clear();
+        lcd.home();
+        lcd.print("Heart-rate");
+        lcd.setCursor(0, 1);
+        lcd.print("88...");
+        delay(1000);
+      }
+    }
+  }  
 }
+
 
 int Off_line_mode()
 {
@@ -80,6 +173,10 @@ int Off_line_mode()
     {
       if(digitalRead(CHECK_SW)==LOW)
       {
+        String strTemp = String("");
+        //strTemp = mlx.readObjectTempC();
+        strTemp = 36.5;
+        
         lcd.clear();
         lcd.home();
         lcd.print("Ok...");
@@ -87,10 +184,19 @@ int Off_line_mode()
         //부저
         lcd.clear();
         lcd.home();
-        lcd.print("Temp: 36.5C");
+        lcd.print("Temp: ");
+
+        lcd.setCursor(6, 0);
+        lcd.print(strTemp);
+        lcd.setCursor(10, 0);
+        lcd.print("`C");
 
         lcd.setCursor(0,1);
-        lcd.print("It`s Good!");
+     
+        if(strTemp.toInt()>= 36 && strTemp.toInt() <= 38)
+          lcd.print("It`s Good!");
+        else
+          lcd.print("It`s bad...");
         delay(2500);
         break;
       }
@@ -138,6 +244,7 @@ int Off_line_mode()
           lcd.setCursor(0,1);
           lcd.print("It` good!");
           okSw = LOW;
+         
           delay(2000);
         }
         delay(1000);
@@ -254,4 +361,21 @@ void Lcd_hello()
   lcd.print("I`m HomeDoctor");
 
   delay(2000);
+}
+void Bluetooth_init()
+{
+  btSerial.begin(9600);
+
+  //while(1)
+  //{
+    if(btSerial.available())
+    {
+     Serial.write(btSerial.read()); 
+    }
+  
+   if(Serial.available())
+   {
+      btSerial.write(Serial.read());
+    }  
+ // }
 }
