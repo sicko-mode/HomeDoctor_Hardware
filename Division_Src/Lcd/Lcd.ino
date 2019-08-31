@@ -186,7 +186,6 @@ void Lcd_start()
   lcd.setCursor(0,1);
   lcd.print("I`m HomeDoctor");
   delay(2000);
-  //piezo melody
 }
 
 void Pin_init() //Pull-up
