@@ -1,5 +1,10 @@
 #include <LiquidCrystal_I2C.h>
+#include <SoftwareSerial.h>
+
 #include <Wire.h>
+
+#define PIN_RX 12
+#define PIN_TX 11
 
 #define CHECK_SW 2
 #define RETURN_SW 3
@@ -19,6 +24,7 @@ volatile int returnSw = LOW;
 volatile int okSw = LOW;
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
+SoftwareSerial btSerial(PIN_TX, PIN_RX);
 
 void Pin_init();
 void Lcd_init();
@@ -40,7 +46,7 @@ void setup() {
   Lcd_hello();
 
   Menu_network();
-
+  btSerial.begin(9600);
 }
 
 void loop() {
