@@ -355,7 +355,7 @@ void Pin_init() //Pull-up
 {
   int i;
   
-  for(i=2;i<6;i++) //Switch input
+  for(i=4;i<8;i++) //Switch input
      pinMode(i, INPUT); 
 
   for(i=8;i<11;i++) //led output
